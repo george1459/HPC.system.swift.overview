@@ -14,7 +14,7 @@ The main Swift XRT pipeline file, an upgraded version of `info.sh` (which was it
 - 2 : Sources Folders
 `AGN` `PSR` `BLL` `UNASOOC` ...
 
-The main folders containing Swift obervations. Within each of these folders, you can find a list of folders with the 4FGL name: e.g. `4FGL_J2055.8+2540`. After jobs finish running `info_point.sh`, folders with names like `point_v3_info_caches_4FGL_J2055.8+2540` can be found. Future analysis shoudld be done on folders with names like such. The outputs of these folders were generated with feeding the **Counterpart** location to XRT pipeline:
+The main folders containing Swift obervations. Within each of these folders, you can find a list of folders with the 4FGL name: e.g. `4FGL_J2055.8+2540`. After jobs finish running `info_point.sh`, folders with names like `point_v3_info_caches_4FGL_J2055.8+2540` can be found. Future analysis should be done on folders with names like such. The outputs of these folders were generated with feeding the **Counterpart** location to XRT pipeline:
 
 - [ ] Inputting 4FGL locations
 - [x] Inputting counterpart locations
@@ -55,10 +55,9 @@ Then, by using `tail -f submission_code_point_3_agn.log`, you can check its outp
 `4FGL_cpt_deg_new_new.txt`
 `4FGL_cpt_hms_new_new.txt`
   
-Files containing associated 4FGL sources' names, counterpart names, and counterpart locations. The reason why there are two of thems is because one contains coordiantes in degree format while the other contains coordinates in hms format. These files were also uploaded on google drive. 
+Files containing associated 4FGL sources' names, counterpart names, and counterpart locations. The reason why there are two of them is because one contains coordinates in degree format while the other contains coordinates in hms format. These files were also uploaded on google drive. 
 
 - 2
 `0819_2.cmd`
 
 Sorry for the bad naming, but this is actually the main cmd (submission) model file. All other cmd files are created from this file.
-
