@@ -14,7 +14,7 @@ The main Swift XRT pipeline file, an upgraded version of `info.sh` (which was it
 - 2 : Sources Folders
 `AGN` `PSR` `BLL` `UNASOOC` ...
 
-The main folders containing Swift obervations. Within each of these folders, you can find a list of folders with the 4FGL name: e.g. `4FGL_J2055.8+2540`. After jobs finish running `info_point.sh`, folders with names like `point_v3_info_caches_4FGL_J1954.3+2836` can be found. Future analysis shoudld be done on folders with names like such. The outputs of these folders were generated with feeding the **Counterpart** location to XRT pipeline:
+The main folders containing Swift obervations. Within each of these folders, you can find a list of folders with the 4FGL name: e.g. `4FGL_J2055.8+2540`. After jobs finish running `info_point.sh`, folders with names like `point_v3_info_caches_4FGL_J2055.8+2540` can be found. Future analysis shoudld be done on folders with names like such. The outputs of these folders were generated with feeding the **Counterpart** location to XRT pipeline:
 
 - [ ] Inputting 4FGL locations
 - [x] Inputting counterpart locations
