@@ -49,7 +49,11 @@ This shell script takes in a folder name and keeps trying to run the `qsub` comm
 Then, by using `tail -f submission_code_point_3_agn.log`, you can check its output on real-time basis. 
 
 ## Some useful commands
-If the `jobtry.sh` is ran with nohup command, to stop it from still trying to 
+If the `jobtry.sh` is ran with nohup command, to stop it from still trying to proceed:
+
+``ps -ef | grep "jobtry.sh"``
+
+The above command will return the job id for such nohup command, which can be used to terminate the program.
 
 
 ## Other not-so-important files
