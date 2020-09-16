@@ -1,6 +1,8 @@
 # HPC.system.swift.overview
 
-This gives an overview of the structure of `/group/phys_heastro/swift/download` folder
+**09/16 Note: This document is being constantly updated as I recollect source files**
+
+This gives an overview of the structure of `/group/phys_heastro/swift/download` folder.
 
 ## Directory Overview
 
@@ -10,6 +12,8 @@ Within this folder, you can find numerous files (Many will be cleaned up soon! H
 `info_point.sh`
 
 The main Swift XRT pipeline file, an upgraded version of `info.sh` (which was its previous name).
+
+`info_point.sh` is ran with options `--xrtppl=yes --spec=yes`. Check `info_point.sh` for its exact behaviors.
 
 - 2 : Sources Folders
 `AGN` `PSR` `BLL` `UNASOOC` ...
