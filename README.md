@@ -90,7 +90,7 @@ nohup wget -nH --no-check-certificate --cut-dirs=5 -r -l0 -c -N -np -R 'index*' 
 
 So it downloads `xrt`, `auxil`, and `log` data, the `bat` data wasn't downloaded.
 
-`old_bulk.sh` passes in the 4FGL catalog position and desired timeframe to `old_download.sh`. **TODO: I need to find out what time was passed to this file**
+`old_bulk.sh` passes in the 4FGL catalog position and desired timeframe to `old_download.sh`. **TODO: I need to find out what time was passed to this file, or maybe no timeframe was passed in, and this was in place in case we need to download future data**
 
 `check_bulk.sh` could be used to check the status of download.
 
