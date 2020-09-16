@@ -72,3 +72,26 @@ Files containing associated 4FGL sources' names, counterpart names, and counterp
 `0819_2.cmd`
 
 Sorry for the bad naming, but this is actually the main cmd (submission) model file. All other cmd files are created from this file.
+
+
+## Order to run pipeline files
+
+- 1
+Generate files in the format of `iden_4FGL.txt` and `unid_4FGL.txt` (still figuring out which file was used to generate these two)
+
+- 2
+Use `old_bulk.sh` (which in turn calls `old_download.sh`, which relies on NASA's script to query SWIFT catalog) to run on these two files and download data. The following set of `wget` commands are carried out:
+
+``
+nohup wget -nH --no-check-certificate --cut-dirs=5 -r -l0 -c -N -np -R 'index*' -erobots=off --retr-symlinks https://heasarc.gsfc.nasa.gov/FTP/swift/data/obs/${starttime1}_${starttime2}//$obsid/xrt/ > download_xrt_$obsid.log 2>&1 &
+nohup wget -nH --no-check-certificate --cut-dirs=5 -r -l0 -c -N -np -R 'index*' -erobots=off --retr-symlinks https://heasarc.gsfc.nasa.gov/FTP/swift/data/obs/${starttime1}_${starttime2}//$obsid/auxil/ > download_auxil_$obsid.log 2>&1 &
+nohup wget -nH --no-check-certificate --cut-dirs=5 -r -l0 -c -N -np -R 'index*' -erobots=off --retr-symlinks https://heasarc.gsfc.nasa.gov/FTP/swift/data/obs/${starttime1}_${starttime2}//$obsid/log/ > download_log_$obsid.log 2>&1 &
+``
+
+So it downloads `xrt`, `auxil`, and `log` data, the `bat` data wasn't downloaded.
+
+`old_bulk.sh` passes in the 4FGL catalog position and desired timeframe to `old_download.sh`. **TODO: I need to find out what time was passed to this file**
+
+`check_bulk.sh` could be used to check the status of download.
+
+I remember we had a problem with downloading using the computation nodes at HPC - those were not connected to the internet. So, the downloads, if I remember clearly, were carried out on the front node
