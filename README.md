@@ -91,7 +91,7 @@ nohup wget -nH --no-check-certificate --cut-dirs=5 -r -l0 -c -N -np -R 'index*' 
 
 So it downloads `xrt`, `auxil`, and `log` data, the `bat` data wasn't downloaded. I think we were going to download `bat` data, but after a few tries, it turned out that `bat` files are very large and do not contribute a lot to our project.
 
-`old_bulk.sh` passes in the 4FGL catalog position and desired timeframe to `old_download.sh`. This will generate a file in the format of `$(date '+%d_%m_%Y')_queryres.txt` in the respective 4FGL folders (e.g. `/BLL/4FGL_J1653.8+3945/29_08_2019_queryres.txt` and `/BLL/4FGL_J1653.8+3945/queryres.txt`)  **It seems there are two queries queried out: one without an exact date and one on 29th Aug. 2019. I cannot retrieve the exact timeframe for each download. I believe the first one was carried on all avaliable time frames, while the other were carried out on files spanning from the time first download finished to 29th Aug. 2019. **
+`old_bulk.sh` passes in the 4FGL catalog position and desired timeframe to `old_download.sh`. This will generate a file in the format of `$(date '+%d_%m_%Y')_queryres.txt` in the respective 4FGL folders (e.g. `/BLL/4FGL_J1653.8+3945/29_08_2019_queryres.txt` and `/BLL/4FGL_J1653.8+3945/queryres.txt`)  **It seems there are two queries queried out: one without an exact date and one on 29th Aug. 2019. I cannot retrieve the exact timeframe for each download. I believe the first one was carried on all avaliable time frames, while the other were carried out on files spanning from the time first download finished to 29th Aug. 2019.**
 
 `check_bulk.sh` could be used to check the status of download.
 
