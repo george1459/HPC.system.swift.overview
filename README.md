@@ -81,7 +81,6 @@ Generate files in the format of `iden_4FGL.txt` and `unid_4FGL.txt`, which are g
 ```
 cp gll_psc_v20.fit sorted_gll_psw_v20.fit
 fsort sorted_gll_psw_v20.fit "CLASS" ascend=no
-fstruct sorted_gll_psw_v20.fit
 ftlist sorted_gll_psw_v20.fit T columns="Source_Name, CLASS1, RAJ2000, DEJ2000" | sed -e 's/^[ \t]*//' | head -5069 | tail -5066 | head -3743 > iden_4FGL.txt
 ftlist sorted_gll_psw_v20.fit T columns="Source_Name, RAJ2000, DEJ2000" | sed -e 's/^[ \t]*//' | head -5069 | tail -n +3916 > unid_4FGL.txt
 ```
