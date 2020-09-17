@@ -147,4 +147,6 @@ Run the following in sequence:
 
   5. Run `get_binaryness.sh` in folder `8_swift`.
 
-- 5 **FINALLY!!** ML files    
+- 5 **FINALLY!!** ML files  
+
+Run the `SWIFT` suffixed files in folder `R_code_try`. These were based on the R code in the 2016 paper.
