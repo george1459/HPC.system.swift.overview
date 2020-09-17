@@ -93,6 +93,12 @@ So it downloads `xrt`, `auxil`, and `log` data, the `bat` data wasn't downloaded
 
 `old_bulk.sh` passes in the 4FGL catalog position and desired timeframe to `old_download.sh`. This will generate a file in the format of `$(date '+%d_%m_%Y')_queryres.txt` in the respective 4FGL folders (e.g. `/BLL/4FGL_J1653.8+3945/29_08_2019_queryres.txt` and `/BLL/4FGL_J1653.8+3945/queryres.txt`)  **It seems there are two queries queried out: one without an exact date and one on 29th Aug. 2019. I cannot retrieve the exact timeframe for each download. I believe the first one was carried on all avaliable time frames, while the other were carried out on files spanning from the time first download finished to 29th Aug. 2019.**
 
+`old_download.sh` should generate a list of `echo -e "Started initiating \033[1;4m$(($rownb * 4))\033[0m wget commands"`. The actual number is `$(($rownb * 4))`. The rest is command-related parameters to make output more beautiful. These outputs are recorded in `nohup.out` for identified sources (3743 lines) and in `nohup_unid.log` for unidentified sources (1154 lines). Sometime, the output for one line is `* 4: syntax error: operand expected (error token is "* 4")`. I think it corresponds to when no SWIFT data was present for that source.
+
 `check_bulk.sh` could be used to check the status of download.
 
-I remember we had a problem with downloading using the computation nodes at HPC - those were not connected to the internet. So, the downloads, if I remember clearly, were carried out on the front node
+It seems a file renaming took place. `old_download.sh` (and `old_bulk.sh`) were previously named `download.sh` (`bulk.sh`). It was renamed to give rooom to the currently named `download.sh` and `bulk.sh`, which were used to create folders with suffix `_arcmin_20` (e.g. `PSR_arcmin_20`). The currently named `download.sh` file does a query and then copy observation folders from the non-suffixed folders (e.g. `PSR`) to the suffxied folders (e.g. `PSR_arcmin_20`).
+
+NB: I remember we had a problem with downloading using the computation nodes at HPC - those were not connected to the internet. So, the downloads should have been carried out on the front node.
+
+
