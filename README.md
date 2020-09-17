@@ -107,23 +107,23 @@ NB: I remember we had a problem with downloading using the computation nodes at 
 This is the main file for analyzing downloaded SWIFT data, which should be funneled to this file. This file is ran with options `--xrtppl=yes --spec=yes` in its latest depolyment.
 
 When ran in the above configuration, this file will:
-  - 1. Query `/group/phys_heastro/swift/download/4FGL_cpt_hms_new_new.txt` or `/group/phys_heastro/swift/download/4FGL_cpt_deg_new_new.txt` for RA/DEC in either hms or deg format of counterpart information. If no counterpart information in found, use "POINT" as input to `xrtpipeline` in the next step.
+  1. Query `/group/phys_heastro/swift/download/4FGL_cpt_hms_new_new.txt` or `/group/phys_heastro/swift/download/4FGL_cpt_deg_new_new.txt` for RA/DEC in either hms or deg format of counterpart information. If no counterpart information in found, use "POINT" as input to `xrtpipeline` in the next step.
   
-  - 2. Run `xrtpipeline` command on all obeservation folders using RA/DEC of counterpart information or "POINT" if no counterpart is found.
+  2. Run `xrtpipeline` command on all obeservation folders using RA/DEC of counterpart information or "POINT" if no counterpart is found.
   
-  - 3. Process `pc` files, use `xselect` to read all event files in and extract an image. (`xselect` is invoked with a `source` command because `xselect` only supports command-line prompts, same in next steps)
+  3. Process `pc` files, use `xselect` to read all event files in and extract an image. (`xselect` is invoked with a `source` command because `xselect` only supports command-line prompts, same in next steps)
   
-  - 4. Draw **error circle** of **60''** around the location info at step 2,  use **signal-to-noise ratio** of **3** to detect sources in the image by `sosta` command. 
+  4. Draw **error circle** of **60''** around the location info at step 2,  use **signal-to-noise ratio** of **3** to detect sources in the image by `sosta` command. 
   
-  - 5. Write the identified sources information into folder `source_location`. These will be a collection of `loc_$i.reg` files, where `loc_0.reg` stores the counterpart position. These files will be in a specical format.
+  5. Write the identified sources information into folder `source_location`. These will be a collection of `loc_$i.reg` files, where `loc_0.reg` stores the counterpart position. These files will be in a specical format.
   
-  - 6. Use `xselect` to again read in all event files, filter on region `loc_0.reg`, carry out `extract image`, carry out `extract spec`, carry out `extract curve`, and `filter pha_cutoff` where the endpoints are set at `lccutoff=(30 100 100 200 200 1000)`.
+  6. Use `xselect` to again read in all event files, filter on region `loc_0.reg`, carry out `extract image`, carry out `extract spec`, carry out `extract curve`, and `filter pha_cutoff` where the endpoints are set at `lccutoff=(30 100 100 200 200 1000)`.
   
-  - 7. Use `ftconvert` to the `im` files generated in step 6 to `txt files`.
+  7. Use `ftconvert` to the `im` files generated in step 6 to `txt files`.
   
-  - 8. If the Global spectrum or the spectrum generated from the 60'' error circle of the counterpart location has count rate bigger than 0.5 counts/s, generate a warning.
+  8. If the Global spectrum or the spectrum generated from the 60'' error circle of the counterpart location has count rate bigger than 0.5 counts/s, generate a warning.
   
-  - 9. Clean up.
+  9. Clean up.
   
 This file has a cache feature implemented. If a result from `xrtpipeline` is present, then do not run step 2 of the above procedure.
 
@@ -135,16 +135,16 @@ This file, when ran on HPC, is submitted to its job system through a bunch of `.
 
 Run the following in sequence:
 
-  - 1. `feature_extract.sh` and `feature_extract_unassoc.sh`. These files will create a collection of folders with prefixs `cpt_list_` (e.g. `cpt_list_BCU`) inside the Sources Folders (e.g. `BCU`).
+  1. `feature_extract.sh` and `feature_extract_unassoc.sh`. These files will create a collection of folders with prefixs `cpt_list_` (e.g. `cpt_list_BCU`) inside the Sources Folders (e.g. `BCU`).
 
-  - 2. **From this step forward, files were run on my local laptop**: Run `correlate.sh` in folder `8_swift` and `9_swift`.
+  2. **From this step forward, files were run on my local laptop**: Run `correlate.sh` in folder `8_swift` and `9_swift`.
   
-  - 3. Run `cleangeneration.sh` in folder `8_swift` (designed for associated sources) and `cleangeneration.sh` in folder `9_swift` (designed for unassociated sources). These two files will generate `ASSOC_CLEANED_DATA.txt` and `UNASSOC_CLEANED_DATA.txt`, respectively. These two files differ a bit in the number of columns, as `UNASSOC_CLEANED_DATA.txt` have the following columns in addition to those in `ASSOC_CLEANED_DATA.txt`:
+  3. Run `cleangeneration.sh` in folder `8_swift` (designed for associated sources) and `cleangeneration.sh` in folder `9_swift` (designed for unassociated sources). These two files will generate `ASSOC_CLEANED_DATA.txt` and `UNASSOC_CLEANED_DATA.txt`, respectively. These two files differ a bit in the number of columns, as `UNASSOC_CLEANED_DATA.txt` have the following columns in addition to those in `ASSOC_CLEANED_DATA.txt`:
 
   ``sourcename,numbercount,ofnumbercount,sourcera,sourcedec``
 
-  - 4. Run `postclean.sh` in folder `8_swift` and `9_swift`. This will generate files `new_ASSOC_CLEANED_DATA.txt` and `new_UNASSOC_CLEANED_DATA.txt`.
+  4. Run `postclean.sh` in folder `8_swift` and `9_swift`. This will generate files `new_ASSOC_CLEANED_DATA.txt` and `new_UNASSOC_CLEANED_DATA.txt`.
 
-  - 5. Run `get_binaryness.sh` in folder `8_swift`.
+  5. Run `get_binaryness.sh` in folder `8_swift`.
 
-- 5 **FINALLY!!** ML files
+- 5 **FINALLY!!** ML files    
