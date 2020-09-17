@@ -85,12 +85,13 @@ Use `old_bulk.sh` (which in turn calls `old_download.sh`, which relies on NASA's
 ```
 nohup wget -nH --no-check-certificate --cut-dirs=5 -r -l0 -c -N -np -R 'index*' -erobots=off --retr-symlinks https://heasarc.gsfc.nasa.gov/FTP/swift/data/obs/${starttime1}_${starttime2}//$obsid/xrt/ > download_xrt_$obsid.log 2>&1 &
 nohup wget -nH --no-check-certificate --cut-dirs=5 -r -l0 -c -N -np -R 'index*' -erobots=off --retr-symlinks https://heasarc.gsfc.nasa.gov/FTP/swift/data/obs/${starttime1}_${starttime2}//$obsid/auxil/ > download_auxil_$obsid.log 2>&1 &
+#nohup wget -nH --no-check-certificate --cut-dirs=5 -r -l0 -c -N -np -R 'index*' -erobots=off --retr-symlinks https://heasarc.gsfc.nasa.gov/FTP/swift/data/obs/${starttime1}_${starttime2}//$obs    id/bat/ > download_bat_$obsid.log 2>&1 &
 nohup wget -nH --no-check-certificate --cut-dirs=5 -r -l0 -c -N -np -R 'index*' -erobots=off --retr-symlinks https://heasarc.gsfc.nasa.gov/FTP/swift/data/obs/${starttime1}_${starttime2}//$obsid/log/ > download_log_$obsid.log 2>&1 &
 ```
 
-So it downloads `xrt`, `auxil`, and `log` data, the `bat` data wasn't downloaded.
+So it downloads `xrt`, `auxil`, and `log` data, the `bat` data wasn't downloaded. I think we were going to download `bat` data, but after a few tries, it turned out that `bat` files are very large and do not contribute a lot to our project.
 
-`old_bulk.sh` passes in the 4FGL catalog position and desired timeframe to `old_download.sh`. **TODO: I need to find out what time was passed to this file, or maybe no timeframe was passed in, and this was in place in case we need to download future data**
+`old_bulk.sh` passes in the 4FGL catalog position and desired timeframe to `old_download.sh`. This will generate a file in the format of `$(date '+%d_%m_%Y')_queryres.txt` in the respective 4FGL folders (e.g. `/BLL/4FGL_J1653.8+3945/29_08_2019_queryres.txt` and `/BLL/4FGL_J1653.8+3945/queryres.txt`)  **It seems there are two queries queried out: one without an exact date and one on 29th Aug. 2019. I cannot retrieve the exact timeframe for each download. I believe the first one was carried on all avaliable time frames, while the other were carried out on files spanning from the time first download finished to 29th Aug. 2019. **
 
 `check_bulk.sh` could be used to check the status of download.
 
