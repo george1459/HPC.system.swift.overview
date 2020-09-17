@@ -85,7 +85,7 @@ Use `old_bulk.sh` (which in turn calls `old_download.sh`, which relies on NASA's
 ```
 nohup wget -nH --no-check-certificate --cut-dirs=5 -r -l0 -c -N -np -R 'index*' -erobots=off --retr-symlinks https://heasarc.gsfc.nasa.gov/FTP/swift/data/obs/${starttime1}_${starttime2}//$obsid/xrt/ > download_xrt_$obsid.log 2>&1 &
 nohup wget -nH --no-check-certificate --cut-dirs=5 -r -l0 -c -N -np -R 'index*' -erobots=off --retr-symlinks https://heasarc.gsfc.nasa.gov/FTP/swift/data/obs/${starttime1}_${starttime2}//$obsid/auxil/ > download_auxil_$obsid.log 2>&1 &
-#nohup wget -nH --no-check-certificate --cut-dirs=5 -r -l0 -c -N -np -R 'index*' -erobots=off --retr-symlinks https://heasarc.gsfc.nasa.gov/FTP/swift/data/obs/${starttime1}_${starttime2}//$obs    id/bat/ > download_bat_$obsid.log 2>&1 &
+#nohup wget -nH --no-check-certificate --cut-dirs=5 -r -l0 -c -N -np -R 'index*' -erobots=off --retr-symlinks https://heasarc.gsfc.nasa.gov/FTP/swift/data/obs/${starttime1}_${starttime2}//$obsid/bat/ > download_bat_$obsid.log 2>&1 &
 nohup wget -nH --no-check-certificate --cut-dirs=5 -r -l0 -c -N -np -R 'index*' -erobots=off --retr-symlinks https://heasarc.gsfc.nasa.gov/FTP/swift/data/obs/${starttime1}_${starttime2}//$obsid/log/ > download_log_$obsid.log 2>&1 &
 ```
 
@@ -106,8 +106,7 @@ NB: I remember we had a problem with downloading using the computation nodes at 
 
 This is the main file for analyzing downloaded SWIFT data, which should be funneled to this file. This file is ran with options `--xrtppl=yes --spec=yes` in its latest depolyment.
 
-
-What this file does:
+When ran in the above configuration, this file will:
   - 1. Query `/group/phys_heastro/swift/download/4FGL_cpt_hms_new_new.txt` or `/group/phys_heastro/swift/download/4FGL_cpt_deg_new_new.txt` for RA/DEC in either hms or deg format of counterpart information. If no counterpart information in found, use "POINT" as input to `xrtpipeline` in the next step.
   
   - 2. Run `xrtpipeline` command on all obeservation folders using RA/DEC of counterpart information or "POINT" if no counterpart is found.
@@ -117,6 +116,14 @@ What this file does:
   - 4. Draw **error circle** of **60''** around the location info at step 2,  use **signal-to-noise ratio** of **3** to detect sources in the image by `sosta` command. 
   
   - 5. Write the identified sources information into folder `source_location`. These will be a collection of `loc_$i.reg` files, where `loc_0.reg` stores the counterpart position. These files will be in a specical format.
+  
+  - 6. Use `xselect` to again read in all event files, filter on region `loc_0.reg`, carry out `extract image`, carry out `extract spec`, carry out `extract curve`, and `filter pha_cutoff` where the endpoints are set at `lccutoff=(30 100 100 200 200 1000)`.
+  
+  - 7. Use `ftconvert` to the `im` files generated in step 6 to `txt files`.
+  
+  - 8. If the Global spectrum or the spectrum generated from the 60'' error circle of the counterpart location has count rate bigger than 0.5 counts/s, generate a warning.
+  
+  - 9. Clean up.
 
 
 
