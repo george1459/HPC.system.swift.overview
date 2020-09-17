@@ -124,6 +124,9 @@ When ran in the above configuration, this file will:
   - 8. If the Global spectrum or the spectrum generated from the 60'' error circle of the counterpart location has count rate bigger than 0.5 counts/s, generate a warning.
   
   - 9. Clean up.
+  
+This file has a cache feature implemented. If a result from `xrtpipeline` is present, then do not run step 2 of the above procedure.
 
+This file, when ran on HPC, is submitted to its job system through a bunch of .cmd files. See Section one on detail of this.
 
 
