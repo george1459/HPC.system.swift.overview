@@ -101,4 +101,22 @@ It seems a file renaming took place. `old_download.sh` (and `old_bulk.sh`) were 
 
 NB: I remember we had a problem with downloading using the computation nodes at HPC - those were not connected to the internet. So, the downloads should have been carried out on the front node.
 
+- 3 
+`info_point.sh`
+
+This is the main file for analyzing downloaded SWIFT data, which should be funneled to this file. This file is ran with options `--xrtppl=yes --spec=yes` in its latest depolyment.
+
+
+What this file does:
+  - 1. Query `/group/phys_heastro/swift/download/4FGL_cpt_hms_new_new.txt` or `/group/phys_heastro/swift/download/4FGL_cpt_deg_new_new.txt` for RA/DEC in either hms or deg format of counterpart information. If no counterpart information in found, use "POINT" as input to `xrtpipeline` in the next step.
+  
+  - 2. Run `xrtpipeline` command on all obeservation folders using RA/DEC of counterpart information or "POINT" if no counterpart is found.
+  
+  - 3. Process `pc` files, use `xselect` to read all event files in and extract an image. (`xselect` is invoked with a `source` command because `xselect` only supports command-line prompts, same in next steps)
+  
+  - 4. Draw **error circle** of **60''** around the location info at step 2,  use **signal-to-noise ratio** of **3** to detect sources in the image by `sosta` command. 
+  
+  - 5. Write the identified sources information into folder `source_location`. These will be a collection of `loc_$i.reg` files, where `loc_0.reg` stores the counterpart position. These files will be in a specical format.
+
+
 
