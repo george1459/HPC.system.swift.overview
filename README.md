@@ -135,7 +135,7 @@ There would still be some leftover sources. Those should only count up to a smal
 
 Then we need to take care of each catalog file on its own:
 
-  - ``for i in $(seq 1 1 49)do\nif ! grep -q "$(head -$i not_searched_crates.txt | tail -1)" crates_catalog.txt\nthen\necho "$(head -$i not_searched_crates.txt | tail -1)" \nfi\ndone`
+  - `for i in $(seq 1 1 49)do\nif ! grep -q "$(head -$i not_searched_crates.txt | tail -1)" crates_catalog.txt\nthen\necho "$(head -$i not_searched_crates.txt | tail -1)" \nfi\ndone`
   - `for i in $(seq 1 1 212)\ndo\nperl new_browse_extract.pl table="NVSS" position="$(head -$i NVSS_to_search.txt | tail -1)" resultmax=1500 radius=1 >> nvss_individual_search.txt\necho "for $i" >> nvss_individual_search.txt\necho "for $i" \ndone`
   - `for i in $(seq 1 1 25)\ndo\n./psrcat -db_file psrcat.db -c "name RaJD DecJD" $(head -$i PSR_to_search.txt | tail -1) >> PSR_individual_search.txt\necho "for $i" \ndone`
   - `for i in $(seq 1 1 135)\ndo\nperl new_browse_extract.pl table="B/2mass" position="$(head -$i 2MASS_to_search.txt | tail -1)" resultmax=1500 radius=0.1 >> 2mass_individual_search.txt\necho "for $i" >> 2mass_individual_search.txt\necho "for $i" \ndone\n`
