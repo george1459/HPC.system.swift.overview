@@ -108,7 +108,15 @@ It seems a file renaming took place. `old_download.sh` (and `old_bulk.sh`) were 
 
 NB: I remember we had a problem with downloading using the computation nodes at HPC - those were not connected to the internet. So, the downloads should have been carried out on the front node.
 
-- 3 
+- 3 Prepare 4FGL counterpart locations file
+
+The 4FGL counterpart location file (location of the 4FGL-listed counterparts) is queried in the following way:
+
+``ftlist sorted_gll_psw_v20.fit T columns="Source_Name, RAJ2000, DEJ2000, CLASS1, CLASS2, ASSOC1, ASSOC2" | tr -s ' ' | sed -e "s/^[ \t]*//" | head -3915 | cut -d ' ' -f7,8 > iden_simbad_search.txt``
+
+The first-round results are retrieved using the SIMBAD database. First visit http://simbad.u-strasbg.fr/simbad/sim-fout and turn on the **list display** buttons for **Identifier, Coordinates 1, Coordinates 2, Notes** (This was what was chosen in previous search. Only **Identifier** and **Coordinates 1** are actually used). Set the **Output format** to "ASCII (aligned, |-separator)" from the scroll-down menu. Then, submit `iden_simbad_search.txt` at http://simbad.u-strasbg.fr/simbad/sim-fid. This will produce a ASCII file. Copy the file to local and name it `simbad.txt`.
+
+- 4 
 `info_point.sh`
 
 This is the main file for analyzing downloaded SWIFT data, which should be funneled to this file. This file is ran with options `--xrtppl=yes --spec=yes` in its latest depolyment.
@@ -138,7 +146,7 @@ This file, when ran on HPC, is submitted to its job system through a bunch of `.
 
 **Note**: For the `UNASSOC` folder, there is a specifically designed `info_point_unassoc.sh` that actually extracts information around each X-Ray source. Use it for anything in `UNASSOC`.
 
-- 4 Data Extraction & Cleaning files
+- 5 Data Extraction & Cleaning files
 
 Run the following in sequence:
 
@@ -154,6 +162,6 @@ Run the following in sequence:
 
   5. Run `get_binaryness.sh` in folder `8_swift`.
 
-- 5 **FINALLY!!** ML files  
+- 6 **FINALLY!!** ML files  
 
 Run the `SWIFT` suffixed files in folder `R_code_try`. These were based on the R code in the 2016 paper.
