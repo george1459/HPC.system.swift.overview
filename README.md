@@ -114,7 +114,37 @@ The 4FGL counterpart location file (location of the 4FGL-listed counterparts) is
 
 ``ftlist sorted_gll_psw_v20.fit T columns="Source_Name, RAJ2000, DEJ2000, CLASS1, CLASS2, ASSOC1, ASSOC2" | tr -s ' ' | sed -e "s/^[ \t]*//" | head -3915 | cut -d ' ' -f7,8 > iden_simbad_search.txt``
 
-The first-round results are retrieved using the SIMBAD database. First visit http://simbad.u-strasbg.fr/simbad/sim-fout and turn on the **list display** buttons for **Identifier, Coordinates 1, Coordinates 2, Notes** (This was what was chosen in previous search. Only **Identifier** and **Coordinates 1** are actually used). Set the **Output format** to "ASCII (aligned, |-separator)" from the scroll-down menu. Then, submit `iden_simbad_search.txt` at http://simbad.u-strasbg.fr/simbad/sim-fid. This will produce a ASCII file. Copy the file to local and name it `simbad.txt`.
+The first-round results are retrieved using the SIMBAD database. First visit http://simbad.u-strasbg.fr/simbad/sim-fout and turn on the **list display** buttons for **Identifier, Coordinates 1, Coordinates 2, Notes** (This was what was chosen in previous search. Only **Identifier** and **Coordinates 1** are actually used). Set the **Output format** to "ASCII (aligned, |-separator)" from the scroll-down menu. Then, submit `iden_simbad_search.txt` at http://simbad.u-strasbg.fr/simbad/sim-fid. This will produce a ASCII file. Copy the file to local system and name it `simbad.txt`.
+
+Because SIMBAD does not contain all catalog info, one needs to filter out the unprocessed files by:
+
+```
+cat simbad.txt | tail -n +2903 | sed -e "s/Identifier not found in the database : //" | grep "CRATES" | sed -e "s/'//g" | sed -e "s/: this identifier has an incorrect format for catalog://" | sed -e "s/\tCRATES : Combined Radio All-Sky Targeted Eight GHz Survey//" | tr -s ' ' | sed '/^$/d' | cut -d ' ' -f 2 > not_searched_crates.txt
+cat simbad.txt | tail -n +2903 | sed -e "s/Identifier not found in the database : //" | sed -e "s/': No known catalog could be found//" | grep "NVSS" > NVSS_to_search.txt
+cat simbad.txt | tail -n +2903 | grep "Identifier not found in the database"  | sed "/NVSS/d" | grep "PSR" | cut -d 'R' -f 2 | sed "s/ //" > PSR_to_search.txt
+cat simbad.txt | tail -n +2903 | grep "Identifier not found in the database"  | sed "/NVSS/d" | sed "/PSR/d" | sed "/CRATES/d" | grep "2MASS" | cut -d ':' -f 2 > 2MASS_to_search.txt
+cat simbad.txt | tail -n +2903 | sed "/NVSS/d" | sed "/PSR/d" | sed "/CRATES/d" | sed "/2MASS/d" | grep "GB6" | cut -d ':' -f 2 > GB6_to_search.txt
+cat simbad.txt | tail -n +2903 | sed "/NVSS/d" | sed "/PSR/d" | sed "/CRATES/d" | sed "/2MASS/d" | sed "/GB6/d"  | grep "PMN" | cut -d ':' -f 2 > PMN_to_search.txt
+cat simbad.txt | tail -n +2903 | sed "/NVSS/d" | sed "/PSR/d" | sed "/CRATES/d" | sed "/2MASS/d" | sed "/GB6/d"  | sed "/PMN/d" | sed "/SDSS/d" | grep "MG1" | cut -d ':' -f 1 | sed -e "s/'//g" >> MG_to_search.txt
+cat simbad.txt | tail -n +2903 | sed "/NVSS/d" | sed "/PSR/d" | sed "/CRATES/d" | sed "/2MASS/d" | sed "/GB6/d"  | sed "/PMN/d" | sed "/SDSS/d" | grep "MG2" | cut -d ':' -f 1 | sed -e "s/'//g" >> MG_to_search.txt
+cat simbad.txt | tail -n +2903 | sed "/NVSS/d" | sed "/PSR/d" | sed "/CRATES/d" | sed "/2MASS/d" | sed "/GB6/d"  | sed "/PMN/d" | sed "/SDSS/d" | grep "MG3" | cut -d ':' -f 1 | sed -e "s/'//g" >> MG_to_search.txt
+cat simbad.txt | tail -n +2903 | sed "/NVSS/d" | sed "/PSR/d" | sed "/CRATES/d" | sed "/2MASS/d" | sed "/GB6/d"  | sed "/PMN/d" | sed "/SDSS/d" | grep "MG4" | cut -d ':' -f 1 | sed -e "s/'//g" >> MG_to_search.txt
+```
+
+There would still be some leftover sources. Those should only count up to a small percentage of the overall sources.
+
+Then we need to take care of each catalog file on its own:
+
+  - `for i in $(seq 1 1 49)\ndo\nif ! grep -q "$(head -$i not_searched_crates.txt | tail -1)" crates_catalog.txt\nthen\necho "$(head -$i not_searched_crates.txt | tail -1)" \nfi\ndone`
+  - `for i in $(seq 1 1 212)\ndo\nperl new_browse_extract.pl table="NVSS" position="$(head -$i NVSS_to_search.txt | tail -1)" resultmax=1500 radius=1 >> nvss_individual_search.txt\necho "for $i" >> nvss_individual_search.txt\necho "for $i" \ndone`
+  - `for i in $(seq 1 1 25)\ndo\n./psrcat -db_file psrcat.db -c "name RaJD DecJD" $(head -$i PSR_to_search.txt | tail -1) >> PSR_individual_search.txt\necho "for $i" \ndone`
+  - `for i in $(seq 1 1 135)\ndo\nperl new_browse_extract.pl table="B/2mass" position="$(head -$i 2MASS_to_search.txt | tail -1)" resultmax=1500 radius=0.1 >> 2mass_individual_search.txt\necho "for $i" >> 2mass_individual_search.txt\necho "for $i" \ndone\n`
+  - `for i in $(seq 1 1 90)\ndo\nperl new_browse_extract.pl table="GB6" position="$(head -$i GB6_to_search.txt | tail -1)" resultmax=1500 radius=1 >> GB6_individual_search.txt\necho "for $i" >> GB6_individual_search.txt\necho "for $i" \ndone`
+  - `for i in $(seq 1 1 54)\ndo\nperl new_browse_extract.pl table="pmn" position="$(head -$i PMN_to_search.txt | tail -1)" resultmax=1500 radius=1 >> PMN_individual_search.txt\necho "for $i" >> PMN_individual_search.txt\necho "for $i" \ndone`
+  - `for i in $(seq 1 1 125)\ndo\nperl new_browse_extract.pl table="mitgb6cm" position="$(head -$i MG_to_search.txt | tail -1)" resultmax=1500 radius=1 >> MG_individual_search.txt\necho "for $i" >> MG_individual_search.txt\necho "for $i" \ndone`
+
+Note that the `seq` start and end numbers need to be changed in future runs.
+
 
 - 4 
 `info_point.sh`
