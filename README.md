@@ -1,6 +1,6 @@
 # HPC.system.swift.overview
 
-**09/16 Note: This document is being constantly updated as I recollect source files**
+**09/22 Note: This document has mostly been updated.**
 
 This gives an overview of the structure of `/group/phys_heastro/swift/download` folder.
 
