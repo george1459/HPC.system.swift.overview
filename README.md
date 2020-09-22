@@ -155,7 +155,7 @@ for i in $(seq 1 1 2911)\ndo\ntosearch=$(cat 4FGL_cpt_hms.txt | head -$i |tail -
 for i in $(seq 1 1 12)\ndo\ntosearch=$(cat 4FGL_cpt_deg.txt | head -$i |tail -1 | cut -d '|' -f 1)\ntoadd=$(grep "$tosearch" <<< $ftsource | cut -d ' ' -f 2,3)\ncat 4FGL_cpt_deg.txt | head -$i |tail -1 | sed -e "s/$/|$toadd/" >> 4FGL_cpt_deg_new_new.txt\necho $i\ndone\n
 ```
 
-**Note: in folder `FGL/2020_09`, a new file `counterpart.sh` is being constructed to include the above commands**
+**Note: in folder `FGL/2020_09`, a new file `counterpart.sh` is constructed to include the above commands**
 
 - 4 
 `info_point.sh`
