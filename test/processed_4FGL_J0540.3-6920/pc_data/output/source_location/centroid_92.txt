@@ -1,0 +1,15 @@
+Calculated Centroid
+ 
+RA(degrees) = 84.63107676062182
+Dec(degrees) = -69.20688291650478
+ 
+RA(hh mm ss.s) = 5h38m31.46s
+Dec(dd mm ss.s) = -69:12:24.78
+ 
+LII(degrees) = 279.59101502303895
+BII(degrees) = -31.675850602982187
+ 
+X = 747.73
+Y = 687.52
+ 
+Error radius (arcsec) = 3.57 

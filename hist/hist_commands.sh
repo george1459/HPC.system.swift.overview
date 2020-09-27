@@ -1,0 +1,1 @@
+xrtcentroid boxdec="44.2553647222222" boxra="307.714741666667" boxradius="0.4" calcpos="yes" chatter="2" cleanup="yes" clobber="yes" deriv="no" hist="no" infile="source_1_v2/2FGL_J2030.7+4417_source_1_v2_pc_combined.evt" interactive="no" outdir="source_1_v2" outfile="2FGL_J2030.7+4417_source_1_v2_pc_combined_xcen.txt" posfile="CALDB"

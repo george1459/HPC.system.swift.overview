@@ -340,13 +340,21 @@ then
 			y_coor2="$(cut -d' ' -f14 <<<"$line")"
 			y_coor3="$(cut -d' ' -f15 <<<"$line")"
 		# If within tens lines, do the command above. Otherwise, slightly change the field name since the number of spaces will vary with line number
-		else
+		elif (( i < 100))
+		then
 			x_coor1="$(cut -d' ' -f9 <<<"$line")"
 			x_coor2="$(cut -d' ' -f10 <<<"$line")"
 			x_coor3="$(cut -d' ' -f11 <<<"$line")"
 			y_coor1="$(cut -d' ' -f12 <<<"$line")"
 			y_coor2="$(cut -d' ' -f13 <<<"$line")"
 			y_coor3="$(cut -d' ' -f14 <<<"$line")"
+		else
+			x_coor1="$(cut -d' ' -f8 <<<"$line")"
+			x_coor2="$(cut -d' ' -f9 <<<"$line")"
+			x_coor3="$(cut -d' ' -f10 <<<"$line")"
+			y_coor1="$(cut -d' ' -f11 <<<"$line")"
+			y_coor2="$(cut -d' ' -f12 <<<"$line")"
+			y_coor3="$(cut -d' ' -f13 <<<"$line")"
 		fi
 
 		# Use xrtcentroid to determine source error radius
@@ -360,14 +368,15 @@ then
 		bool=$(echo $ret | cut -d ' ' -f 1)
 		val=$(echo $ret | cut -d ' ' -f 2)
 		# radius_check.txt stores the information of if detected source falls into the error circle
-		if [[ $bool == "False" ]]
+		if [[ $bool == "True" ]]
 		then
+			echo "${i} ${cent_x} ${cent_y} ${catalogra} ${catalogdec} ${cent_err}" >> radius_check.txt
+			echo -e "Detected source at location \033[1;4m${cent_x}\033[0m ;DEC:\033[1;4m${cent_y}\033[0m within \033[1;4m${cent_err}\033[0m arcsec of the counterpart location"
+		else
+
 			echo -e "Detected source at location \033[1;4m${cent_x}\033[0m ;DEC:\033[1;4m${cent_y}\033[0m NOT within \033[1;4m${cent_err}\033[0m arcsec of the counterpart location"
 			echo -e "Actual difference in locations \033[1;4m${val}\033[0m arcsec"
 			echo "Neglecting ..."
-		else
-			echo "${i} ${cent_x} ${cent_y} ${catalogra} ${catalogdec} ${cent_err}" >> radius_check.txt
-			echo -e "Detected source at location \033[1;4m${cent_x}\033[0m ;DEC:\033[1;4m${cent_y}\033[0m within \033[1;4m${cent_err}\033[0m arcsec of the counterpart location"
 		fi
 
 		echo "Writing loc_$i.reg..."
@@ -455,11 +464,11 @@ then
 		
 		for i in $(seq 1 1 ${source_number})
 		do
-			(cd each_source
-			mkdir $k)
 			cd source_location
 			echo "Doing this for source $k..."
 			k=$(cat radius_check.txt | head -$i | tail -1 | cut -d ' ' -f 1)
+			(cd $outest/processed_$filepath/pc_data/output/each_source
+			mkdir $k)
 			mv spec_$k.im $outest/processed_$filepath/pc_data/output/each_source/$k
 			mv im_$k.im $outest/processed_$filepath/pc_data/output/each_source/$k
 			mv lc_$k.im $outest/processed_$filepath/pc_data/output/each_source/$k
