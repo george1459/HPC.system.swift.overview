@@ -1,0 +1,87 @@
+******************************************************************************
+*                              Welcome to XIMAGE                             *
+******************************************************************************
+
+                                                          Type "help" for help
+
+
+                                           VERSION 4.5.1  09:39:42 27-Sep-2020
+
+ No of detectors read in:   34
+[XIMAGE> read im.im
+ Telescope SWIFT XRT NONE
+ Image size = 1000 x 1000 pixels
+ Image rebin = 1.000
+ Image center = 500.5, 500.5
+ Reading an image
+  Image level, min = 0.0000000 max = 3.0000000
+ Copied MAP1 to MAP9
+[XIMAGE> cpd ./pgplot.gif/gif
+[XIMAGE> display
+ Plotting image
+  Min =   0.00000000      Max =    3.00000000
+[XIMAGE> ra_dec_to_pixel/circle=10
+Conversion based on MAP1
+R.A. (2000 d/f=  0h02m58.17s or   0.742):00 02 58.17
+Dec  (2000 d/f=+62:16:09.40  or  62.269):+62 16 09.4
+
+ Pixel coordinates X = 546.4441318877504 Y = 242.9474759948805
+
+[XIMAGE> cpd /xs
+[XIMAGE> cpd ./1_pgplot.gif/gif
+[XIMAGE> display
+ Plotting image
+  Min =   0.00000000      Max =    3.00000000
+[XIMAGE> detect/bright/snr=3
+ Calculating background: Poisson statistics assumed
+ Too many (>80%) background boxes rejected
+          16   failed
+          32   4.09363490E-03
+          64   3.25436937E-03
+         128   3.08931782E-03
+ >>> Optimum box size = 128
+ Background box size = 128
+ Background =3.0893E-03 cts/original-pixel
+            =3.0893E-03 cts/image-pixel
+            =3.7362E-04 cts/sqarcmin/s
+            =5.7672E-07 cts/original-pixel/s
+ Source box size (orig pix):    8 (image pix):    8
+ >>>>> Searching for excesses
+     45 excesses found
+ >>>>> Removing contiguous sources
+ Using slow contiguous search
+         45 excesses left
+ >>>>> Sort by radius
+ >>>>> Applying thresholds
+  Using average energy for PSF:    1.00000000
+  snr threshold =    3.00000000
+  bgnd fluctuation probability limit =    9.99999975E-05
+ >>>>> removing duplicates
+   #   count/s    err         pixel      Vig  RA(2000)   Dec(2000)   Err  H-Box
+                             x     y     corr                        rad  (sec)
+    1 8.56E-03+/-1.4E-03   422.8   479.1 1.02 00 03 40.0 +62 25 25.9  -1     27
+[XIMAGE> ra_dec_to_pixel/circle=10
+Conversion based on MAP1
+R.A. (2000 d/f=  0h02m58.17s or   0.742):00 02 58.17
+Dec  (2000 d/f=+62:16:09.40  or  62.269):+62 16 09.4
+
+ Pixel coordinates X = 546.4441318877504 Y = 242.9474759948805
+
+[XIMAGE> grid
+[XIMAGE> sosta/detect_sources
+ Using MAP1
+ Using a locally computed background
+                    X = 422.81250    Y = 479.09375
+  Using average energy for PSF:    1.00000000
+ Source half-box for 0.66 EEF is    5.1 pixels
+        Half-box for 0.90 EEF is   17.3 pixels
+ Total # of counts 29.000000 (in 110 elemental sq pixels)
+ Background inner radius:   18.2 pixels; outer radius:   34.7 pixels
+ Innerbox counts 43.000000 in 1369 sq or pixels
+ Outerbox counts 57.000000 in 4761 sq or pixels
+ Background counts 14.000000 in 3392 sq pixels
+ s.i. corrected for PSF + sampling dead time
+                                + vignetting -> 9.290E-03 +/- 1.8E-03 c/sec <-
+ Signal to Noise Ratio             :            5.300E+00
+[XIMAGE> cpd /xs
+[XIMAGE> quit

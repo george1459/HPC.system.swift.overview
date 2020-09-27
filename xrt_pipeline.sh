@@ -380,6 +380,21 @@ then
 	if [ ! -e radius_check.txt ]
 	then
 		echo -e "\033[1mNo source detected within error circle, exiting ...\033[0m"
+		cd $outest/processed_$filepath/pc_data/output
+		mkdir global_view
+		mkdir log_file
+		# Do some cleaning
+		cd $outest/processed_$filepath/pc_data/
+		mkdir original_file
+		mv *pc* original_file
+		rm -f ximage.sh
+		rm -f xselect.sh
+		mv im.im output/global_view/global_im.im
+		cd output
+		rm -f im.det
+		mv sh_ximage.log log_file
+		mv sh_xselect.log log_file
+		mv xselect.log log_file
 		exit 0
 	else
 		source_number=$(cat radius_check.txt | wc -l | awk '$1=$1')
@@ -492,6 +507,7 @@ then
 		cd $outest/processed_$filepath/pc_data/output
 
 		# No longer extracing specturm for the whole image. If wanted, uncomment the lines below
+		# Note that the spectrum for the whole image is not extracted at this point, one needs to modify the code before to do that job
 
 		# globalspec=$(grep "Spectrum         has" xselect.log | cut -d r -f 3 | cut -d c -f 1 | awk '$1=$1' | awk '{print $0*1}' )
 		# call=$(expr $globalspec \> 0.5)
