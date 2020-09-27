@@ -4,9 +4,10 @@
 #   Author        : Shicheng Liu
 #   Email         : shicheng2000@uchicago.edu
 #   File Name     : distance.py
-#   Last Modified : Thu Sep 24 2020 23:50:08 (UTC +8)
+#   Last Modified : Sun Sep 27 2020 09:43:09 (UTC +8)
 #
 # ====================================================
+
 
 from astropy.coordinates import SkyCoord
 import sys

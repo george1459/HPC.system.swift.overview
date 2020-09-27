@@ -5,9 +5,10 @@
 #   Author        : Shicheng Liu
 #   Email         : shicheng2000@uchicago.edu
 #   File Name     : xrt_pipeline.sh
-#   Last Modified : Thu Sep 24 2020 23:06:39 (UTC +8)
+#   Last Modified : Sun Sep 27 2020 09:42:56 (UTC +8)
 #
 # ====================================================
+
 
 
 outest=$(pwd)
