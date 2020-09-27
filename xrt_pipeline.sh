@@ -11,6 +11,8 @@
 
 
 outest=$(pwd)
+SCRIPT=$(readlink -f "$0")
+SCRIPTPATH=$(dirname "$SCRIPT")
 
 if [[ $1 == "--help" ]]
 then
@@ -53,8 +55,8 @@ snrcutoff=3
 lccutofflen=3
 lccutoff=(30 100 100 200 200 1000)
 
-4FGL_cpt_hms_file = ""${4FGL_cpt_hms_file}""
-4FGL_cpt_deg_file = ""${4FGL_cpt_deg_file}""
+FGL_cpt_hms_file="/home/georgejar/Parkinson/FGL/4FGL_cpt_hms_new_new.txt"
+FGL_cpt_deg_file="/home/georgejar/Parkinson/FGL/4FGL_cpt_deg_new_new.txt"
 
 filepath=$1
 shift
@@ -122,21 +124,28 @@ cd $outest
 
 # Querying the 4FGL-listed counterpart file for location information
 # IMPORTANT: The counterpart file needs to be generated at this point
-if grep -q "${filepath:5}" "${4FGL_cpt_hms_file}"
+if grep -q "${filepath:5}" ${FGL_cpt_hms_file}
 then
-	catalogra=$(grep "${filepath:5}" "${4FGL_cpt_hms_file}" | cut -d '|' -f 2 | tr -s ' ' | cut -d ' ' -f 1,2,3)
-	catalogdec=$(grep "${filepath:5}" "${4FGL_cpt_hms_file}" | cut -d '|' -f 2 | tr -s ' ' | cut -d ' ' -f 4,5,6)
+	catalogra=$(grep "${filepath:5}" "${FGL_cpt_hms_file}" | cut -d '|' -f 2 | tr -s ' ' | cut -d ' ' -f 1,2,3)
+	catalogdec=$(grep "${filepath:5}" "${FGL_cpt_hms_file}" | cut -d '|' -f 2 | tr -s ' ' | cut -d ' ' -f 4,5,6)
 	cpt_identifier=1
-elif grep -q "${filepath:5}" "${4FGL_cpt_deg_file}"
+elif grep -q "${filepath:5}" ${4FGL_cpt_deg_file}
 then
-	catalogra=$(grep "${filepath:5}" "${4FGL_cpt_deg_file}" | cut -d '|' -f 2 | tr -s ' ' | cut -d ' ' -f 1)
-	catalogdec=$(grep "${filepath:5}" "${4FGL_cpt_deg_file}" | cut -d '|' -f 2 | tr -s ' ' | cut -d ' ' -f 2)
+	catalogra=$(grep "${filepath:5}" "${FGL_cpt_deg_file}" | cut -d '|' -f 2 | tr -s ' ' | cut -d ' ' -f 1)
+	catalogdec=$(grep "${filepath:5}" "${FGL_cpt_deg_file}" | cut -d '|' -f 2 | tr -s ' ' | cut -d ' ' -f 2)
 	cpt_identifier=2
 else
 	cpt_identifier=3
 fi
 
-echo -e "Resolved counterpart location to RA:\033[1;4m$catalogra\033[0m ;DEC:\033[1;4m$catalogdec\033[0m and will be drawing error circle of 10'' around it'"
+# If cannot find counterpart location, there is nothing to do, quit
+if [ $cpt_identifier -eq 3 ]
+then
+	echo "Cannot find counterpart information, quitting ..."
+	exit 1
+fi
+
+echo -e "Resolved counterpart location to RA:\033[1;4m$catalogra\033[0m ;DEC:\033[1;4m$catalogdec\033[0m and will be drawing error circle of 10'' around it"
 
 cd "$filepath"
 
@@ -221,6 +230,11 @@ then
 	for i in $(seq 1 1 $arrlen)
 	do
 		entry[i]=${filename:$((i - 1))*252:252}
+		if [ $i -ne $arrlen ]
+		then
+			entry[i]=${entry[i]::-1}
+		fi
+		# echo "${entry[i]}"
 	done
 
 	echo "xselect <<EOF" >> xselect.sh
@@ -333,7 +347,6 @@ then
 			y_coor2="$(cut -d' ' -f13 <<<"$line")"
 			y_coor3="$(cut -d' ' -f14 <<<"$line")"
 		fi
-		rm ${filepath}_pc_output.txt
 
 		# Use xrtcentroid to determine source error radius
 		# NOTE: "boxradius" is set to 1 arcmin
@@ -342,44 +355,45 @@ then
 		cent_y="$(cat "centroid_$i.txt" | grep "Dec(degrees)" | cut -d '=' -f 2 | awk '$1=$1')"
 		cent_err="$(cat "centroid_$i.txt" | grep "Error radius (arcsec)" | cut -d '=' -f 2 | awk '$1=$1')"
 		
-		ret="$(python $outest/utils/distance.py ${cent_x} ${cent_y} ${catalogra} ${catalogdec} ${cent_err})"
-		if [[ $ret == "True\n" ]]
+		ret="$(python $SCRIPTPATH/utils/distance.py ${cent_x} ${cent_y} "${catalogra}" "${catalogdec}" ${cent_err})"
+		bool=$(echo $ret | cut -d ' ' -f 1)
+		val=$(echo $ret | cut -d ' ' -f 2)
+		# radius_check.txt stores the information of if detected source falls into the error circle
+		if [[ $bool == "False" ]]
 		then
-
+			echo -e "Detected source at location \033[1;4m${cent_x}\033[0m ;DEC:\033[1;4m${cent_y}\033[0m NOT within \033[1;4m${cent_err}\033[0m arcsec of the counterpart location"
+			echo -e "Actual difference in locations \033[1;4m${val}\033[0m arcsec"
+			echo "Neglecting ..."
 		else
-
+			echo "${i} ${cent_x} ${cent_y} ${catalogra} ${catalogdec} ${cent_err}" >> radius_check.txt
+			echo -e "Detected source at location \033[1;4m${cent_x}\033[0m ;DEC:\033[1;4m${cent_y}\033[0m within \033[1;4m${cent_err}\033[0m arcsec of the counterpart location"
 		fi
 
 		echo "Writing loc_$i.reg..."
 		echo "# Region file format: DS9 version 4.1" >> loc_$i.reg
 		echo "global color=green dashlist=8 3 width=1 font=\"helvetica 10 normal roman\" select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 include=1 source=1" >> loc_$i.reg
 		echo "fk5" >> loc_$i.reg
-		# NOTE: changed to 60 arcsec on Aug. 26th
-		echo "circle($x_coor1:$x_coor2:$x_coor3,$y_coor1:$y_coor2:$y_coor3,60.000\")" >> loc_$i.reg
+		echo "circle($cent_x,$cent_y,$cent_err\")" >> loc_$i.reg
 	done
-	#echo "All location files are now written in .reg formats:)"
-	
-	echo "Writing loc_0.reg...(The Counterpart Position)"
-	echo "# Region file format: DS9 version 4.1" >> loc_0.reg
-	echo "global color=green dashlist=8 3 width=1 font=\"helvetica 10 normal roman\" select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 include=1 source=1" >> loc_0.reg
-	echo "fk5" >> loc_0.reg
-	# NOTE: changed to 60 arcsec on Aug. 26th
-	if [ $cpt_identifier -eq 1 ]
+
+
+	if [ ! -e radius_check.txt ]
 	then
-		x_coor1="$(cut -d ' ' -f 1 <<< $catalogra)"
-		x_coor2="$(cut -d ' ' -f 2 <<< $catalogra)"
-		x_coor3="$(cut -d ' ' -f 3 <<< $catalogra)"
-		y_coor1="$(cut -d ' ' -f 1 <<< $catalogdec)"
-		y_coor2="$(cut -d ' ' -f 2 <<< $catalogdec)"
-		y_coor3="$(cut -d ' ' -f 3 <<< $catalogdec)"
-		echo "circle($x_coor1:$x_coor2:$x_coor3,$y_coor1:$y_coor2:$y_coor3,60.000\")" >> loc_0.reg
+		echo -e "\033[1mNo source detected within error circle, exiting ...\033[0m"
+		exit 0
 	else
-		echo "circle($catalogra,$catalogdec,60.000\")" >> loc_0.reg
+		source_number=$(cat radius_check.txt | wc -l | awk '$1=$1')
+		if [ ${source_number} -eq 1 ]
+		then
+			echo -e "\033[1mOne source detected within error circle\033[0m"
+		else
+			echo -e "\033[1mNOTICE: More than one source detected within error circle\033[0m"
+		fi
 	fi
 
 	if [ $spec -eq 1 ]
 	then
-		echo "Extracting spectrum & lightcurve for each source identified ..."
+		echo "Extracting spectrum & lightcurve for source identified within error circle..."
 		echo "xselect << EOF" >> loop.sh
 		echo "$filepath_each_spec" >> loop.sh
 		echo "read event" >> loop.sh
@@ -393,41 +407,26 @@ then
 			echo "${entry[i]}" >> loop.sh
 			echo "" >> loop.sh
 		done
-		
-		echo "filter region loc_0.reg" >> loop.sh
-		echo "extract image" >> loop.sh
-		echo "save image im_0.im" >> loop.sh
-		echo "extract spec" >> loop.sh
-		echo "save spec spec_0.im" >> loop.sh
-		echo "extract curve" >> loop.sh
-		echo "save curve lc_0.im" >> loop.sh
-		for j in $(seq 1 1 $lccutofflen)
-		do
-			echo "filter pha_cutoff ${lccutoff[$(($j * 2 - 2))]} ${lccutoff[$(($j * 2 - 1))]}" >> loop.sh
-			echo "extract curve" >> loop.sh
-			echo "save curve lc_0_cutoff_$j.im" >> loop.sh
-			echo "clear pha_cutoff" >> loop.sh
-		done
-		echo "clear region" >> loop.sh
 
-		#for i in $(seq 1 1 $(($endline - $startline - 1)))
-		#do
-			#echo "filter region loc_$i.reg" >> loop.sh
-			#echo "extract image" >> loop.sh
-			#echo "save image im_$i.im" >> loop.sh
-			#echo "extract spec" >> loop.sh
-			#echo "save spec spec_$i.im" >> loop.sh
-			#echo "extract curve" >> loop.sh
-			#echo "save curve lc_$i.im" >> loop.sh
-			#for j in $(seq 1 1 $lccutofflen)
-			#do
-				#echo "filter pha_cutoff ${lccutoff[$(($j * 2 - 2))]} ${lccutoff[$(($j * 2 - 1))]}" >> loop.sh
-				#echo "extract curve" >> loop.sh
-				#echo "save curve lc_${i}_cutoff_$j.im" >> loop.sh
-				#echo "clear pha_cutoff" >> loop.sh
-			#done
-			#echo "clear region" >> loop.sh
-		#done
+		for i in $(seq 1 1 ${source_number})
+		do
+			k=$(cat radius_check.txt | head -$i | tail -1 | cut -d ' ' -f 1)
+			echo "filter region loc_$k.reg" >> loop.sh
+			echo "extract image" >> loop.sh
+			echo "save image im_$k.im" >> loop.sh
+			echo "extract spec" >> loop.sh
+			echo "save spec spec_$k.im" >> loop.sh
+			echo "extract curve" >> loop.sh
+			echo "save curve lc_$k.im" >> loop.sh
+			for j in $(seq 1 1 $lccutofflen)
+			do
+				echo "filter pha_cutoff ${lccutoff[$(($j * 2 - 2))]} ${lccutoff[$(($j * 2 - 1))]}" >> loop.sh
+				echo "extract curve" >> loop.sh
+				echo "save curve lc_${k}_cutoff_$j.im" >> loop.sh
+				echo "clear pha_cutoff" >> loop.sh
+			done
+			echo "clear region" >> loop.sh
+		done
 		echo "quit" >> loop.sh
 		echo "EOF" >> loop.sh
 		chmod 775 loop.sh
@@ -438,184 +437,104 @@ then
 		cd $outest/processed_$filepath/pc_data/output
 		mkdir each_source
 		
-		echo "Doing this for source 0..."
-		(cd each_source
-		mkdir 0)
-		cd source_location
-		mv spec_0.im $outest/processed_$filepath/pc_data/output/each_source/0
-		mv im_0.im $outest/processed_$filepath/pc_data/output/each_source/0
-		mv lc_0.im $outest/processed_$filepath/pc_data/output/each_source/0
-
-		for j in $(seq 1 1 $lccutofflen)
+		for i in $(seq 1 1 ${source_number})
 		do
-			mv lc_0_cutoff_$j.im $outest/processed_$filepath/pc_data/output/each_source/0
-		done
-
-		cd $outest/processed_$filepath/pc_data/output/each_source/0
-		ftconvert spec_0.im spec_0.txt "-" "-"
-		ftconvert lc_0.im lc_0.txt "-" "-"
-
-		for j in $(seq 1 1 $lccutofflen)
-		do
-			ftconvert lc_0_cutoff_$j.im lc_0_cutoff_$j.txt "-" "-"
-		done
-
-		if [ $graph -eq 1 ]
-		then
-			(
-			cd $outest
-			python energy.py $outest/processed_$filepath/pc_data/output/each_source/0/spec_0.txt $outest/processed_$filepath/pc_data/output/each_source/0/ 'spec' 2>/dev/null
-			python energy.py $outest/processed_$filepath/pc_data/output/each_source/0/lc_0.txt $outest/processed_$filepath/pc_data/output/each_source/0/ 'lc' 2>/dev/null
-			)
-			mv spec.png spec_0.png
-			mv lc.png lc_0.png
-
-			(
-			cd $outest
-			for j in $(seq 1 1 $lccutofflen)
-			do
-				python energy.py $outest/processed_$filepath/pc_data/output/each_source/0/lc_0_cutoff_$j.txt $outest/processed_$filepath/pc_data/output/each_source/0/$j 'lc' 2>/dev/null
-			done
-			)
+			(cd each_source
+			mkdir $k)
+			cd source_location
+			echo "Doing this for source $k..."
+			k=$(cat radius_check.txt | head -$i | tail -1 | cut -d ' ' -f 1)
+			mv spec_$k.im $outest/processed_$filepath/pc_data/output/each_source/$k
+			mv im_$k.im $outest/processed_$filepath/pc_data/output/each_source/$k
+			mv lc_$k.im $outest/processed_$filepath/pc_data/output/each_source/$k
 
 			for j in $(seq 1 1 $lccutofflen)
 			do
-				mv ${j}lc.png lc_0_cutoff_$j.png
+				mv lc_${k}_cutoff_$j.im $outest/processed_$filepath/pc_data/output/each_source/$k
 			done
-		fi
+
+			cd $outest/processed_$filepath/pc_data/output/each_source/$k
+			ftconvert spec_$k.im spec_$k.txt "-" "-"
+			ftconvert lc_$k.im lc_$k.txt "-" "-"
+
+			for j in $(seq 1 1 $lccutofflen)
+			do
+				ftconvert lc_${k}_cutoff_$j.im lc_${k}_cutoff_$j.txt "-" "-"
+			done
+
+			if [ $graph -eq 1 ]
+			then
+				(
+				cd $outest
+				python energy.py $outest/processed_$filepath/pc_data/output/each_source/$k/spec_$k.txt $outest/processed_$filepath/pc_data/output/each_source/$k/ 'spec' 2>/dev/null
+				python energy.py $outest/processed_$filepath/pc_data/output/each_source/$k/lc_$k.txt $outest/processed_$filepath/pc_data/output/each_source/$k/ 'lc' 2>/dev/null
+				)
+				mv spec.png spec_$k.png
+				mv lc.png lc_$k.png
+
+				(
+				cd $outest
+				for j in $(seq 1 1 $lccutofflen)
+				do
+					python energy.py $outest/processed_$filepath/pc_data/output/each_source/$k/lc_${k}_cutoff_$j.txt $outest/processed_$filepath/pc_data/output/each_source/$k/$j 'lc' 2>/dev/null
+				done
+				)
+
+				for j in $(seq 1 1 $lccutofflen)
+				do
+					mv ${j}lc.png lc_${k}_cutoff_$j.png
+				done
+			fi
+
+			cd $outest/processed_$filepath/pc_data/output
+		done
 
 		cd $outest/processed_$filepath/pc_data/output
 
-		
-		#for i in $(seq 1 1 $(($endline - $startline - 1)))
-		#do
-			#echo "Doing this for source $i..."
-			#(cd each_source
-			#mkdir $i)
-			#cd source_location
-			#mv spec_$i.im $outest/processed_$filepath/pc_data/output/each_source/$i
-			#mv im_$i.im $outest/processed_$filepath/pc_data/output/each_source/$i
-			#mv lc_$i.im $outest/processed_$filepath/pc_data/output/each_source/$i
+		# No longer extracing specturm for the whole image. If wanted, uncomment the lines below
 
-			#for j in $(seq 1 1 $lccutofflen)
-			#do
-				#mv lc_${i}_cutoff_$j.im $outest/processed_$filepath/pc_data/output/each_source/$i
-			#done
+		# globalspec=$(grep "Spectrum         has" xselect.log | cut -d r -f 3 | cut -d c -f 1 | awk '$1=$1' | awk '{print $0*1}' )
+		# call=$(expr $globalspec \> 0.5)
+		# if [ $call -eq 1 ]
+		# then
+		# 	echo -e "\033[41;37mNOTE: Global spectrum over threhold 0.5 counts/s. Consider pile-up suppression:\033[0m"
+		# 	echo -e "\033[41;37m$globalspec\033[0m"
+		# else
+		# 	echo "Global spectrum within 0.5 counts/s:"
+		# 	echo "$globalspec"
+		# fi
 
-			#cd $outest/processed_$filepath/pc_data/output/each_source/$i
-			#ftconvert spec_$i.im spec_$i.txt "-" "-"
-			#ftconvert lc_$i.im lc_$i.txt "-" "-"
+		for i in $(seq 1 1 ${source_number})
+		do
+			(cd $outest/processed_$filepath/pc_data/output/source_location)
+			sourcespec=$(grep "Spectrum         has" sh_loop.log | head -$i | tail -1 | cut -d r -f 3 | cut -d c -f 1 | awk '$1=$1' | awk '{print $0*1}')
+			call=$(expr $sourcespec \> 0.5)
+			if [ $call -eq 1 ]
+			then
+				echo -e "\033[41;37mNOTE: No. $k source spectrum over threhold 0.5 counts/s. Consider pile-up suppression:\033[0m"
+				echo -e "\033[41;37m$sourcespec\033[0m"
+			else
+				echo "Source $k spectrum within 0.5 counts/s:"
+				echo "$sourcespec"
+			fi
+		done
+		echo "Done:)"
+	fi 
 
-			#for j in $(seq 1 1 $lccutofflen)
-			#do
-				#ftconvert lc_${i}_cutoff_$j.im lc_${i}_cutoff_$j.txt "-" "-"
-			#done
-
-			#if [ $graph -eq 1 ]
-			#then
-				#(
-				#cd $outest
-				#python energy.py $outest/processed_$filepath/pc_data/output/each_source/$i/spec_$i.txt $outest/processed_$filepath/pc_data/output/each_source/$i/ 'spec' 2>/dev/null
-				#python energy.py $outest/processed_$filepath/pc_data/output/each_source/$i/lc_$i.txt $outest/processed_$filepath/pc_data/output/each_source/$i/ 'lc' 2>/dev/null
-				#)
-				#mv spec.png spec_$i.png
-				#mv lc.png lc_$i.png
-
-				#(
-				#cd $outest
-				#for j in $(seq 1 1 $lccutofflen)
-				#do
-					#python energy.py $outest/processed_$filepath/pc_data/output/each_source/$i/lc_${i}_cutoff_$j.txt $outest/processed_$filepath/pc_data/output/each_source/$i/$j 'lc' 2>/dev/null
-				#done
-				#)
-
-				#for j in $(seq 1 1 $lccutofflen)
-				#do
-					#mv ${j}lc.png lc_${i}_cutoff_$j.png
-				#done
-			#fi
-
-			#cd $outest/processed_$filepath/pc_data/output
-		#done
-
-		cd $outest/processed_$filepath/pc_data/output
-		globalspec=$(grep "Spectrum         has" xselect.log | cut -d r -f 3 | cut -d c -f 1 | awk '$1=$1' | awk '{print $0*1}' )
-		call=$(expr $globalspec \> 0.5)
-		if [ $call -eq 1 ]
-		then
-			echo -e "\033[41;37mNOTE: Global spectrum over threhold 0.5 counts/s. Consider pile-up suppression:\033[0m"
-			echo -e "\033[41;37m$globalspec\033[0m"
-		else
-			echo "Global spectrum within 0.5 counts/s:"
-			echo "$globalspec"
-		fi
-
-		sourcespec=$(grep "Spectrum         has" sh_loop.log | head -$i | tail -1 | cut -d r -f 3 | cut -d c -f 1 | awk '$1=$1' | awk '{print $0*1}')
-		call=$(expr $sourcespec \> 0.5)
-		if [ $call -eq 1 ]
-		then
-			echo -e "\033[41;37mNOTE: No. 0 source spectrum over threhold 0.5 counts/s. Consider pile-up suppression:\033[0m"
-			echo -e "\033[41;37m$sourcespec\033[0m"
-		else
-			echo "Source 0 spectrum within 0.5 counts/s:"
-			echo "$sourcespec"
-		fi
-
-		#for i in $(seq 1 1 $(($endline - $startline - 1)))
-		#do
-			#sourcespec=$(grep "Spectrum         has" sh_loop.log | head -$i | tail -1 | cut -d r -f 3 | cut -d c -f 1 | awk '$1=$1' | awk '{print $0*1}')
-			#call=$(expr $sourcespec \> 0.5)
-			#if [ $call -eq 1 ]
-			#then
-				#echo -e "\033[41;37mNOTE: No. $i source spectrum over threhold 0.5 counts/s. Consider pile-up suppression:\033[0m"
-				#echo -e "\033[41;37m$sourcespec\033[0m"
-			#else
-				#echo "Source $i spectrum within 0.5 counts/s:"
-				#echo "$sourcespec"
-			#fi
-		#done
-		#echo "Done:)"
-	fi # fi with (if spec)
-
-	#echo "Cleaning-up"
+	echo "Cleaning-up"
 	cd $outest/processed_$filepath/pc_data
 	rm -f ximage.sh
 	rm -f xselect.sh
 	(cd output
 	mkdir global_view)
 	mv im.im output/global_view/global_im.im
-	#mv lc.im output/global_view/global_lc.im
 
-	#for i in $(seq 1 1 $lccutofflen)
-	#do
-		#mv lc_cutoff_$i.im output/global_view/global_lc_$i.im
-		#if [ $graph -eq 1 ]
-		#then
-			#mv ${i}lc.png output/global_view/global_lc_$i.png
-		#fi
-		#mv lc_cutoff_$i.txt output/global_view/global_lc_$i.txt
-	#done
-
-	if [ $graph -eq 1 ]
-	then
-		mv lc.png output/global_view/global_lc.png
-	fi
-	#mv pgplot.xwd output/global_view/global_screenshot.xwd
-	
-	if [ $graph -eq 1 ]
-	then
-		mv spec.png output/global_view/global_spec.png
-	fi
-	
-	#mv spec.spec output/global_view/global_spec.spec
-	#mv spec.txt output/global_view/global_spec.txt
-	#mv lc.txt output/global_view/global_lc.txt
 	cd output
 	rm -f im.det
 	mkdir log_file
-	#mv sh_loop.log log_file
 	mv sh_ximage.log log_file
 	mv sh_xselect.log log_file
+	mv sh_loop.log log_file
 	mv xselect.log log_file
 	cd $outest/processed_$filepath/pc_data
 	mkdir original_file
@@ -643,203 +562,3 @@ then
 else
 	echo -e "\033[1mNo cleaned pc & po data found, skipping\033[0m"
 fi
-
-#cd $outest/processed_$filepath
-#mkdir wt_data
-
-#cd $outest
-#cd "$filepath"
-
-## then deal with the wt_po_cl files
-#if [ $useunpiped -eq 0 ]
-#then
-	#for d in 1_[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]
-	#do
-		#(
-		#cd "$d"
-		#cp *wt*po_cl.evt $outest/processed_$filepath/wt_data) 2>/dev/null
-	#done
-#else
-	#for d in [0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]
-	#do
-		#(
-		#cd "$d"/xrt/event
-		#cp *wt*po_cl* $outest/processed_$filepath/wt_data) 2>/dev/null
-	#done
-#fi
-
-
-#cd $outest/processed_$filepath/wt_data
-#filenumber=$(ls -l|grep "^-"| wc -l)
-#if [ $filenumber -ne 0 ]
-#then
-	#echo -e "\033[1mDetected wt files, running on wt files\033[0m"
-	#gunzip * 2>/dev/null
-
-	#filename=""
-	#for entry in *
-	#do
-		#filename+=",$entry"
-	#done
-	#filename=${filename#?}  # Discard the first comma
-
-	#strlen=$(echo -n $filename | wc -m)
-	#arrlen=$((strlen/252 + 1))
-
-	## 28 * 9 = 252
-	## The entire filename string is chopped off to 9 parts, each contains an entry and a comma
-	## This is needed for the xselect pipeline, which only takes in a maximum of 1000 chars at a time
-	#for i in $(seq 1 1 $arrlen)
-	#do
-		#entry[i]=${filename:$((i - 1))*252:252}
-	#done
-
-	##echo "Writing xselect.sh in processed_$filepath/wt_data folder ..."
-	#echo "xselect <<EOF" >> xselect.sh
-	#echo "$filepath_wt_po_cl" >> xselect.sh
-	#echo "read event" >> xselect.sh
-	#echo "./" >> xselect.sh
-	#echo "${entry[1]}" >> xselect.sh
-	#echo "yes" >> xselect.sh
-
-	#for i in $(seq 2 1 $arrlen)
-	#do
-		#echo "read event" >> xselect.sh
-		#echo "${entry[i]}" >> xselect.sh
-		#echo "" >> xselect.sh
-	#done
-
-	#echo "extract image" >> xselect.sh
-	#echo "save image im.im" >> xselect.sh
-	#echo "extract spec" >> xselect.sh
-	#echo "save spec spec.spec" >> xselect.sh
-	#echo "extract curve" >> xselect.sh
-	#echo "save curve lc.im" >> xselect.sh
-
-	#for i in $(seq 1 1 $lccutofflen)
-	#do
-		#echo "filter pha_cutoff ${lccutoff[$(($i * 2 - 2))]} ${lccutoff[$(($i * 2 - 1))]}" >> xselect.sh
-		#echo "extract curve" >> xselect.sh
-		#echo "save curve lc_cutoff_$i.im" >> xselect.sh
-		#echo "clear pha_cutoff" >> xselect.sh
-	#done
-
-	#echo "quit" >> xselect.sh
-	#echo "EOF" >> xselect.sh
-
-	##echo "Finished writing xselect.sh"
-	##echo "Excuting xselect.sh ..."
-	#chmod 775 xselect.sh
-	#source xselect.sh >> sh_xselect.log
-	##echo "Finished executing xselect.sh"
-
-	#echo "ximage <<EOF" >> ximage.sh
-	#echo "read im.im" >> ximage.sh
-	#echo "cpd ./pgplot.gif/gif" >> ximage.sh
-	#echo "display" >> ximage.sh
-	#echo "cpd /xs" >> ximage.sh
-	#echo "quit" >> ximage.sh
-	#echo "EOF" >> ximage.sh
-
-	##echo "Finished writing ximage.sh"
-	##echo "Excuting ximage.sh"
-	#chmod 775 ximage.sh
-	#source ximage.sh >> sh_ximage.log
-	##echo "Finished executing ximage.sh"
-
-	##echo "Post-execution processing..."
-	#mkdir output
-	#mv sh_xselect.log $outest/processed_$filepath/wt_data/output
-	#mv sh_ximage.log $outest/processed_$filepath/wt_data/output
-	#mv pgplot.gif output/${filepath}_wt_detection.gif
-	#mv xselect.log output
-	#cd output
-	#echo "This is the output of info.sh on folder $filepath for windowed timing data" >> $filepath_wt_output.txt
-
-	#startline=$(grep -n 'HK Directory' xselect.log |cut -d : -f 1 | tail -1)
-	#endline=$(($(grep -n 'extract image' xselect.log |cut -d : -f 1 | tail -1) - 1))
-
-	#cat xselect.log | head -$endline | tail -$(($endline - $startline)) >> ${filepath}_wt_output.txt
-	#echo "End of output of info.sh on folder $filepath" >> ${filepath}_wt_output.txt
-
-	## Now automating energy spectrum extraction
-	##echo "Now extracting energy spectrum and saving it as $filepath_all_spec.png..."
-	#cd $outest/processed_$filepath/wt_data
-	#ftconvert spec.spec spec.txt "-" "-"
-	#ftconvert lc.im lc.txt "-" "-"
-
-	#for i in $(seq 1 1 $lccutofflen)
-	#do
-		#ftconvert lc_cutoff_$i.im lc_cutoff_$i.txt "-" "-"
-	#done
-
-	#cd $outest
-	#if [ $graph == yes ]
-	#then
-	#python energy.py processed_$filepath/wt_data/spec.txt processed_$filepath/wt_data/ 'spec' 2>/dev/null
-	#python energy.py processed_$filepath/wt_data/lc.txt processed_$filepath/wt_data/ 'lc' 2>/dev/null
-
-	#for i in $(seq 1 1 $lccutofflen)
-	#do
-		#python energy.py processed_$filepath/wt_data/lc_cutoff_$i.txt processed_$filepath/wt_data/$i 'lc' 2>/dev/null
-	#done
-	#fi
-
-	#cd $outest/processed_$filepath/wt_data/output
-	#globalspec=$(grep "Spectrum         has" xselect.log | cut -d r -f 3 | cut -d c -f 1 | awk '$1=$1' )
-	#call=$( echo "$globalspec>100" | bc)
-	#if [ $call -eq 1 ]
-	#then
-		#echo -e "\033[41;37mNOTE: Global spectrum over threhold 100 counts/s. Consider pile-up suppression:\033[0m"
-		#echo -e "\033[41;37m$globalspec\033[0m"
-	#else
-		#echo "Global spectrum within 100 counts/s:"
-		#echo "$globalspec"
-	#fi
-
-	##echo "Done:)"
-
-	##echo "Cleaning-up"
-	#cd $outest/processed_$filepath/wt_data
-	#rm -f ximage.sh
-	#rm -f xselect.sh
-	#(cd output
-	#mkdir global_view)
-	#mv im.im output/global_view/global_im.im
-	##mv pgplot.xwd output/global_view/global_screenshot.xwd
-	#if [ $graph -eq 1 ]
-	#then
-		#mv spec.png output/global_view/global_spec.png
-	#fi
-	#mv spec.spec output/global_view/global_spec.spec
-	#mv spec.txt output/global_view/global_spec.txt
-	#mv lc.im output/global_view/global_lc.im
-
-	#for i in $(seq 1 1 $lccutofflen)
-	#do
-		#mv lc_cutoff_$i.im output/global_view/global_lc_$i.im
-		#mv lc_cutoff_$i.txt output/global_view/global_lc_$i.txt
-		#if [ $graph -eq 1 ]
-		#then
-			#mv ${i}lc.png output/global_view/global_lc_$i.png
-		#fi
-	#done
-
-	#mv lc.txt output/global_view/global_lc.txt
-	#if [ $graph -eq 1 ]
-	#then
-		#mv lc.png output/global_view/global_lc.png
-	#fi
-	#cd output
-	#mkdir log_file
-	#mv sh_ximage.log log_file
-	#mv sh_xselect.log log_file
-	#mv xselect.log log_file
-	#cd $outest/processed_$filepath/wt_data
-	#mkdir original_file
-	#mv *wt* original_file
-	#echo -e "\033[1mFinished with wt files\033[0m"
-#else
-	#echo -e "\033[1mNo cleaned wt & po data found, skipping\033[0m"
-#fi
-
