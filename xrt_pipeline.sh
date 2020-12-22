@@ -265,14 +265,14 @@ then
 	echo "read im.im" >> ximage.sh
 	echo "cpd ./pgplot.gif/gif" >> ximage.sh
 	echo "display" >> ximage.sh
-	echo "ra_dec_to_pixel/circle=10" >> ximage.sh
+	echo "ra_dec_to_pixel/circle=60" >> ximage.sh
 	echo "$catalogra" >> ximage.sh
 	echo "$catalogdec" >> ximage.sh
 	echo "cpd /xs" >> ximage.sh
 	echo "cpd ./1_pgplot.gif/gif" >> ximage.sh
 	echo "display" >> ximage.sh
 	echo "detect/bright/snr=$snrcutoff" >> ximage.sh
-	echo "ra_dec_to_pixel/circle=10" >> ximage.sh
+	echo "ra_dec_to_pixel/circle=60" >> ximage.sh
 	echo "$catalogra" >> ximage.sh
 	echo "$catalogdec" >> ximage.sh
 	echo "grid" >> ximage.sh
