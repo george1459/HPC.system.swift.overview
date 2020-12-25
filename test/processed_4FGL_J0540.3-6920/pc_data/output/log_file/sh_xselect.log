@@ -3,8 +3,8 @@
  
 > Enter session name >[4FGL_J0540.3-6920_pc_po_cl] 4FGL_J0540.3-6920_pc_po_cl
 4FGL_J0540.3-6920_pc_po_cl:SUZAKU > read event
-> Enter the Event file dir >[/home/georgejar/Parkinson/HPC.system.swift.overvieww/test/processed_4FGL_J0540.3-6920/pc_data/] ./
-> Enter Event file list >[sw00053402008xpcw2po_cl.evt,sw00053402009xpcw2po_cl.evvt,sw00053402010xpcw2po_cl.evt,sw00081677001xpcw3po_cl.evt,sw00081677002xpcw3po__cl.evt] sw00033603054xpcw3po_cl.evt,sw00033650001xpcw3po_cl.evt,sw00045451001xppcw3po_cl.evt,sw00045451002xpcw3po_cl.evt,sw00045452001xpcw3po_cl.evt,sw000454533001xpcw3po_cl.evt,sw00045453002xpcw3po_cl.evt,sw00045453003xpcw3po_cl.evt,sw000053400001xpcw4po_cl.evt
+> Enter the Event file dir >[/home/georgejar/Parkinson/HPC.system.swift.overview/test/processed_4FGL_J0540.3-6920/pc_data/] ./
+> Enter Event file list >[sw00053402008xpcw2po_cl.evt,sw00053402009xpcw2po_cl.evt,sw00053402010xpcw2po_cl.evt,sw00081677001xpcw3po_cl.evt,sw00081677002xpcw3po_cl.evt] sw00033603054xpcw3po_cl.evt,sw000336550001xpcw3po_cl.evt,sw00045451001xpcw3po_cl.evt,sw00045451002xpcw3po_cl.evt,sw00045452001xpcw3po_cl.evt,sw00045453001xpcw3po_cl.evt,sw00045453002xpcw3po_cl.evt,sw00045453003xpcw3po_cl.evt,sw00053400001xpccw4po_cl.evt
 Got new mission: SWIFT
 > Reset the mission ? >[yes] yes
  
@@ -44,7 +44,7 @@ Data Directory is: /home/georgejar/Parkinson/HPC.system.swift.overview/test/proc
 HK Directory is: /home/georgejar/Parkinson/HPC.system.swift.overview/test/processed_4FGL_J0540.3-6920/pc_data/
  
 4FGL_J0540.3-6920_pc_po_cl:SWIFT-XRT-PHOTON > read event
-> Enter Event file list >[sw00033603054xpcw3po_cl.evt,sw00033650001xpcw3po_cl.evvt,sw00045451001xpcw3po_cl.evt,sw00045451002xpcw3po_cl.evt,sw00045452001xpcw3po__cl.evt,sw00045453001xpcw3po_cl.evt,sw00045453002xpcw3po_cl.evt,sw00045453003xpccw3po_cl.evt,sw00053400001xpcw4po_cl.evt] sw00053400002xpcw4po_cl.evt,sw000534000003xpcw4po_cl.evt,sw00053400004xpcw4po_cl.evt,sw00053400005xpcw4po_cl.evt,sw000053400006xpcw3po_cl.evt,sw00053400007xpcw3po_cl.evt,sw00053400008xpcw3po_cl.evt,,sw00053400009xpcw3po_cl.evt,sw00053400010xpcw3po_cl.evt
+> Enter Event file list >[sw00033603054xpcw3po_cl.evt,sw00033650001xpcw3po_cl.evt,sw00045451001xpcw3po_cl.evt,sw00045451002xpcw3po_cl.evt,sw00045452001xpcw3po_cl.evt,sw00045453001xpcw3po_cl.evt,sw000454533002xpcw3po_cl.evt,sw00045453003xpcw3po_cl.evt,sw00053400001xpcw4po_cl.evt] sw00053400002xpcw4po_cl.evt,sw00053400003xpcw4po_cl.evt,sw00053400004xpcw4po_cl.evt,sw00053400005xpcw4po_cl.evt,sw00053400006xpccw3po_cl.evt,sw00053400007xpcw3po_cl.evt,sw00053400008xpcw3po_cl.evt,sw00053400009xpcw3po_cl.evt,sw00053400010xpcw3po_cl.evt
  
  
         OBJECT                OBS_ID      DATE-OBS            DATAMODE
@@ -92,7 +92,7 @@ HK Directory is: /home/georgejar/Parkinson/HPC.system.swift.overview/test/proces
  
 4FGL_J0540.3-6920_pc_po_cl:SWIFT-XRT-PHOTON > 
 4FGL_J0540.3-6920_pc_po_cl:SWIFT-XRT-PHOTON > read event
-> Enter Event file list >[sw00053400002xpcw4po_cl.evt,sw00053400003xpcw4po_cl.evvt,sw00053400004xpcw4po_cl.evt,sw00053400005xpcw4po_cl.evt,sw00053400006xpcw3po__cl.evt,sw00053400007xpcw3po_cl.evt,sw00053400008xpcw3po_cl.evt,sw00053400009xpccw3po_cl.evt,sw00053400010xpcw3po_cl.evt] sw00053400011xpcw3po_cl.evt,sw000534000012xpcw3po_cl.evt,sw00053400013xpcw3po_cl.evt,sw00053400014xpcw3po_cl.evt,sw000053400015xpcw3po_cl.evt,sw00053402004xpcw2po_cl.evt,sw00053402005xpcw2po_cl.evt,,sw00053402006xpcw2po_cl.evt,sw00053402007xpcw2po_cl.evt
+> Enter Event file list >[sw00053400002xpcw4po_cl.evt,sw00053400003xpcw4po_cl.evt,sw00053400004xpcw4po_cl.evt,sw00053400005xpcw4po_cl.evt,sw00053400006xpcw3po_cl.evt,sw00053400007xpcw3po_cl.evt,sw000534000008xpcw3po_cl.evt,sw00053400009xpcw3po_cl.evt,sw00053400010xpcw3po_cl.evt] sw00053400011xpcw3po_cl.evt,sw00053400012xpcw3po_cl.evt,sw00053400013xpcw3po_cl.evt,sw00053400014xpcw3po_cl.evt,sw00053400015xpccw3po_cl.evt,sw00053402004xpcw2po_cl.evt,sw00053402005xpcw2po_cl.evt,sw00053402006xpcw2po_cl.evt,sw00053402007xpcw2po_cl.evt
  
  
         OBJECT                OBS_ID      DATE-OBS            DATAMODE
@@ -149,7 +149,7 @@ Data Directory is: /home/georgejar/Parkinson/HPC.system.swift.overview/test/proc
 HK Directory is: /home/georgejar/Parkinson/HPC.system.swift.overview/test/processed_4FGL_J0540.3-6920/pc_data/
  
 4FGL_J0540.3-6920_pc_po_cl:SWIFT-XRT-PHOTON > read event
-> Enter Event file list >[sw00053400011xpcw3po_cl.evt,sw00053400012xpcw3po_cl.evvt,sw00053400013xpcw3po_cl.evt,sw00053400014xpcw3po_cl.evt,sw00053400015xpcw3po__cl.evt,sw00053402004xpcw2po_cl.evt,sw00053402005xpcw2po_cl.evt,sw00053402006xpccw2po_cl.evt,sw00053402007xpcw2po_cl.evt] sw00053402008xpcw2po_cl.evt,sw000534022009xpcw2po_cl.evt,sw00053402010xpcw2po_cl.evt,sw00081677001xpcw3po_cl.evt,sw000081677002xpcw3po_cl.evt
+> Enter Event file list >[sw00053400011xpcw3po_cl.evt,sw00053400012xpcw3po_cl.evt,sw00053400013xpcw3po_cl.evt,sw00053400014xpcw3po_cl.evt,sw00053400015xpcw3po_cl.evt,sw00053402004xpcw2po_cl.evt,sw000534022005xpcw2po_cl.evt,sw00053402006xpcw2po_cl.evt,sw00053402007xpcw2po_cl.evt] sw00053402008xpcw2po_cl.evt,sw00053402009xpcw2po_cl.evt,sw00053402010xpcw2po_cl.evt,sw00081677001xpcw3po_cl.evt,sw00081677002xpccw3po_cl.evt
  
  
         OBJECT                OBS_ID      DATE-OBS            DATAMODE
