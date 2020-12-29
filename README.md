@@ -2,7 +2,7 @@
 
 - 1 Generate cleaned 4FGL source location files
 
-Given `gll_psc_v22.fit` and `gll_psc_v23.fit`, generate cleaned files in the following way:
+Given `gll_psc_v22.fit`, `gll_psc_v23.fit`, and `gll_psc_v27.fit`, generate cleaned files in the following way:
 
 ```
 cp gll_psc_v22.fit sorted_gll_psc_v22.fit
@@ -18,6 +18,15 @@ fsort sorted_gll_psc_v23.fit "CLASS2, CLASS1" ascend=no
 ftlist sorted_gll_psc_v23.fit T columns="Source_Name, CLASS2, RAJ2000, DEJ2000" | sed 's/\t//' | head -5792 | tail -n +4| head -202 > iden_4FGL_v23.txt
 ftlist sorted_gll_psc_v23.fit T columns="Source_Name, CLASS1, RAJ2000, DEJ2000" | sed 's/\t//' | head -5792 | tail -n +206 | head -4109 >> iden_4FGL_v23.txt
 ftlist sorted_gll_psc_v23.fit T columns="Source_Name, CLASS1, RAJ2000, DEJ2000" | sed 's/\t//' | head -5792 | tail -1478 > unid_4FGL_v23.txt
+```
+
+**v27 from Pablo on 20/12/29**
+```
+cp gll_psc_v27.fit sorted_gll_psc_v27.fit
+fsort sorted_gll_psc_v27.fit "CLASS2, CLASS1" ascend=no
+ftlist sorted_gll_psc_v27.fit T columns="Source_Name, CLASS2, RAJ2000, DEJ2000" | sed 's/\t//' | head -5792 | tail -n +4| head -198 > iden_4FGL_v27.txt
+ftlist sorted_gll_psc_v27.fit T columns="Source_Name, CLASS1, RAJ2000, DEJ2000" | sed 's/\t//' | head -5792 | tail -n +202 | head -4121 >> iden_4FGL_v27.txt
+ftlist sorted_gll_psc_v27.fit T columns="Source_Name, CLASS2, RAJ2000, DEJ2000" | sed 's/\t//' | head -5791 | tail -1470 > unid_4FGL_v27.txt
 ```
 
 There might be a clever way to do this. TODO for the future.
