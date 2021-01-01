@@ -31,6 +31,30 @@ ftlist sorted_gll_psc_v27.fit T columns="Source_Name, CLASS2, RAJ2000, DEJ2000" 
 
 There might be a clever way to do this. TODO for the future.
 
+Meanwhile, one should start preparing the `database.csv` file, which records a particular source is in v22 or v27, or in both. It also records the location of source. It will be appended in the next rounds to include more columns when source analysis is carried out. The initialization of this source is done with a Julia file. Execute `julia csv_generate.jl` inside the `utils` folder.
+
+- 2
+Use `bulk_download.sh` (which in turn calls `bulk_download_helper.sh`, which relies on NASA's script to query SWIFT catalog) to run on these two files and download data. The following set of `wget` commands are carried out:
+
+```
+nohup wget -nH --no-check-certificate --cut-dirs=5 -r -l0 -c -N -np -R 'index*' -erobots=off --retr-symlinks https://heasarc.gsfc.nasa.gov/FTP/swift/data/obs/${starttime1}_${starttime2}//$obsid/xrt/ > download_xrt_$obsid.log 2>&1 &
+nohup wget -nH --no-check-certificate --cut-dirs=5 -r -l0 -c -N -np -R 'index*' -erobots=off --retr-symlinks https://heasarc.gsfc.nasa.gov/FTP/swift/data/obs/${starttime1}_${starttime2}//$obsid/auxil/ > download_auxil_$obsid.log 2>&1 &
+#nohup wget -nH --no-check-certificate --cut-dirs=5 -r -l0 -c -N -np -R 'index*' -erobots=off --retr-symlinks https://heasarc.gsfc.nasa.gov/FTP/swift/data/obs/${starttime1}_${starttime2}//$obsid/bat/ > download_bat_$obsid.log 2>&1 &
+nohup wget -nH --no-check-certificate --cut-dirs=5 -r -l0 -c -N -np -R 'index*' -erobots=off --retr-symlinks https://heasarc.gsfc.nasa.gov/FTP/swift/data/obs/${starttime1}_${starttime2}//$obsid/log/ > download_log_$obsid.log 2>&1 &
+```
+
+So it downloads `xrt`, `auxil`, and `log` data, the `bat` data wasn't downloaded. I think we were going to download `bat` data, but after a few tries, it turned out that `bat` files are very large and do not contribute a lot to our project.
+
+`bulk_download.sh` passes in the 4FGL catalog position and desired timeframe to `bulk_download_helper.sh`. This will generate a file in the format of `$(date '+%d_%m_%Y')_queryres.txt` in the respective 4FGL folders (e.g. `/BLL/4FGL_J1653.8+3945/29_08_2019_queryres.txt` and `/BLL/4FGL_J1653.8+3945/queryres.txt`)  **A new download is executed as of Jan. 1st 2021 and is currently in progress.**
+
+~~`old_download.sh` should generate a list of `echo -e "Started initiating \033[1;4m$(($rownb * 4))\033[0m wget commands"`. The actual number is `$(($rownb * 4))`. The rest is command-related parameters to make output more beautiful. These outputs are recorded in `nohup.out` for identified sources (3743 lines) and in `nohup_unid.log` for unidentified sources (1154 lines). Sometime, the output for one line is `* 4: syntax error: operand expected (error token is "* 4")`. I think it corresponds to when no SWIFT data was present for that source. Caching is implemented in this file: if an observation id is already present, do not download the relevant files.~~
+
+`check_bulk.sh` could be used to check the status of download.
+
+~~It seems a file renaming took place. `old_download.sh` (and `old_bulk.sh`) were previously named `download.sh` (`bulk.sh`). It was renamed to give rooom to the currently named `download.sh` and `bulk.sh`, which were used to create folders with suffix `_arcmin_20` (e.g. `PSR_arcmin_20`). The currently named `download.sh` file does a query and then copy observation folders from the non-suffixed folders (e.g. `PSR`) to the suffxied folders (e.g. `PSR_arcmin_20`). The only difference between these two files (and thus these two sorts of folders) is that `old_download.sh` or non-suffixed folders ran the query with `radius = 30` while the `download.sh` or suffixed folders ran the query with `radius = 20`.~~
+
+NB: I remember we had a problem with downloading using the computation nodes at HPC - those were not connected to the internet. So, the downloads should have been carried out on the front node.
+
 
 - 3 Prepare 4FGL counterpart locations file
 
