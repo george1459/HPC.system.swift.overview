@@ -100,6 +100,8 @@ then
 	echo -e "\033[41;37mWarning: Queried rows equal to Max Query Row, consider raising resultmax to prevent missing files\033[0m"
 fi
 
+executed=$rownb
+
 for i in $(seq 3 1 $(($rownb + 2)))
 do
 	line=$(cat $(date '+%d_%m_%Y')_queryres.txt | head -$i | tail -1)
@@ -122,6 +124,7 @@ do
 		nohup wget -nH --no-check-certificate --cut-dirs=5 -r -l0 -c -N -np -R 'index*' -erobots=off --retr-symlinks https://heasarc.gsfc.nasa.gov/FTP/swift/data/obs/${starttime1}_${starttime2}//$obsid/log/ > download_log_$obsid.log 2>&1 &
 	else 
 		echo "$name/$obsid folder already exists, skipping"
+		executed=$(($executed - 1))
 	fi
 done
 
@@ -129,5 +132,5 @@ if [[ "$rownb" == " " ]]
 then
 	echo -e "Started initiating \033[1;4m0\033[0m wget commands"
 else
-	echo -e "Started initiating \033[1;4m$(($rownb * 4))\033[0m wget commands"
+	echo -e "Started initiating \033[1;4m$(($executed * 4))\033[0m wget commands"
 fi
