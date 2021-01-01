@@ -87,11 +87,10 @@ fi
 
 #rm -rf $name
 mkdir -p $name 
-outest=$(pwd)
 rm -f $name/$(date '+%d_%m_%Y')_queryres.txt
 
 # Use NASA-provided PERL script to query the swift master catalog table
-perl utils/new_browse_extract.pl table=$table position="$position" resultmax=$resultmax radius=$radius outfile="$name/$(date '+%d_%m_%Y')_queryres.txt" time="$timerg"
+perl /group/phys_heastro/swift/HPC.system.swift.overview/utils/new_browse_extract.pl table=$table position="$position" resultmax=$resultmax radius=$radius outfile="$name/$(date '+%d_%m_%Y')_queryres.txt" time="$timerg"
 
 cd $name
 rownb=$(cat $(date '+%d_%m_%Y')_queryres.txt | tail -1 | cut -d s -f 5 | cut -d r -f 1 | awk '$1=$1')

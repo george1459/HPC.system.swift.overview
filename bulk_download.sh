@@ -69,6 +69,6 @@ do
 	name=$(head -$i $input | tail -1 | cut -d ',' -f 1)
 	ra=$(head -$i $input | tail -1 | cut -d ',' -f 3)
 	dec=$(head -$i $input | tail -1 |cut -d ',' -f 4)
-	./bulk_download_helper.sh --name="$directory/${name}" --position="$ra, $dec" --time="$timerg"
+	./bulk_download_helper.sh --name="/group/phys_heastro/swift/download/$directory/${name}" --position="$ra, $dec" --time="$timerg"
 	echo "Doing this for $i"
 done
