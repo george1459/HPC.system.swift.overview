@@ -133,5 +133,5 @@ if [[ "$rownb" == " " ]]
 then
 	echo -e "Started initiating \033[1;4m0\033[0m wget commands"
 else
-	echo -e "Started initiating \033[1;4m$(($executed * 4))\033[0m wget commands"
+	echo -e "Started initiating \033[1;4m$(($executed * 3))\033[0m wget commands"
 fi
