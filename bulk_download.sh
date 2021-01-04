@@ -62,9 +62,9 @@ echo "$linenb lines detected, running on line $sb to $eb"
 for i in $(seq $sb 1 $eb)
 do
 	directory=$(head -$i $input | tail -1 | cut -d ',' -f 2)
-	if [ ! -e $directory ]
+	if [ ! -e /group/phys_heastro/swift/download/$directory ]
 	then
-		mkdir $directory
+		mkdir /group/phys_heastro/swift/download/$directory
 	fi
 	name=$(head -$i $input | tail -1 | cut -d ',' -f 1)
 	ra=$(head -$i $input | tail -1 | cut -d ',' -f 3)
